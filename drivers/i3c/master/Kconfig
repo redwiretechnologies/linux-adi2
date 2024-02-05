@@ -1,4 +1,12 @@
 # SPDX-License-Identifier: GPL-2.0-only
+config ADI_I3C_MASTER
+	tristate "Analog Devices I3C controller driver"
+	depends on I3C
+	depends on HAS_IOMEM
+	depends on !(ALPHA || PARISC)
+	help
+	  Support for Analog Devices I3C Controller.
+
 config CDNS_I3C_MASTER
 	tristate "Cadence I3C master driver"
 	depends on I3C
