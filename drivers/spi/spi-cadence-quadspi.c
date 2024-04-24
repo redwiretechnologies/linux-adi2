@@ -2170,7 +2170,10 @@ static int cqspi_probe(struct platform_device *pdev)
 
 		if (of_device_is_compatible(pdev->dev.of_node,
 					    "xlnx,versal-ospi-1.0")) {
-			dma_set_mask(&pdev->dev, DMA_BIT_MASK(64));
+			ret = dma_set_mask(&pdev->dev, DMA_BIT_MASK(64));
+			if (ret)
+				goto probe_reset_failed;
+
 			if (cqspi->master_ref_clk_hz >= TAP_GRAN_SEL_MIN_FREQ)
 				writel(0x1, cqspi->iobase + CQSPI_REG_VERSAL_ECO);
 		}
@@ -2246,10 +2249,11 @@ static int cqspi_remove(struct platform_device *pdev)
 	return 0;
 }
 
-#ifdef CONFIG_PM_SLEEP
 static int cqspi_suspend(struct device *dev)
 {
 	struct cqspi_st *cqspi = dev_get_drvdata(dev);
+	struct spi_master *master = dev_get_drvdata(dev);
+	int ret;
 
 	if (cqspi->clk_tuned && !cqspi->tuning_complete.done &&
 	    !wait_for_completion_timeout(&cqspi->tuning_complete,
@@ -2257,13 +2261,27 @@ static int cqspi_suspend(struct device *dev)
 		return -ETIMEDOUT;
 	}
 
+<<<<<<< HEAD
+	if (cqspi->clk_tuned && !cqspi->tuning_complete.done &&
+	    !wait_for_completion_timeout(&cqspi->tuning_complete,
+		msecs_to_jiffies(CQSPI_TUNING_TIMEOUT_MS))) {
+		return -ETIMEDOUT;
+	}
+
+=======
+	ret = spi_master_suspend(master);
+>>>>>>> linux-xlnx/xlnx_rebase_v6.1_LTS
 	cqspi_controller_enable(cqspi, 0);
-	return 0;
+
+	clk_disable_unprepare(cqspi->clk);
+
+	return ret;
 }
 
 static int cqspi_resume(struct device *dev)
 {
 	struct cqspi_st *cqspi = dev_get_drvdata(dev);
+<<<<<<< HEAD
 	u32 ret;
 
 	cqspi_controller_init(cqspi);
@@ -2297,16 +2315,51 @@ static int cqspi_resume(struct device *dev)
 
 	return 0;
 }
+=======
+	struct spi_master *master = dev_get_drvdata(dev);
+	u32 ret;
 
-static const struct dev_pm_ops cqspi__dev_pm_ops = {
-	.suspend = cqspi_suspend,
-	.resume = cqspi_resume,
-};
+	cqspi_controller_init(cqspi);
+	cqspi->current_cs = -1;
+	cqspi->sclk = 0;
+	cqspi->extra_dummy = false;
+	cqspi->clk_tuned = false;
+>>>>>>> linux-xlnx/xlnx_rebase_v6.1_LTS
 
-#define CQSPI_DEV_PM_OPS	(&cqspi__dev_pm_ops)
-#else
-#define CQSPI_DEV_PM_OPS	NULL
-#endif
+	ret = cqspi_setup_flash(cqspi);
+	if (ret) {
+		dev_err(dev, "failed to setup flash parameters %d\n", ret);
+		return ret;
+	}
+
+	ret = zynqmp_pm_ospi_mux_select(cqspi->pd_dev_id,
+					PM_OSPI_MUX_SEL_LINEAR);
+	if (ret)
+		return ret;
+
+	/* Set the direction as output and enable the output */
+	gpio_direction_output(cqspi->gpio, 1);
+	udelay(1);
+
+	/* Set value 0 to pin */
+	gpio_set_value(cqspi->gpio, 0);
+	udelay(10);
+
+	/* Set value 1 to pin */
+	gpio_set_value(cqspi->gpio, 1);
+	udelay(35);
+
+	clk_prepare_enable(cqspi->clk);
+	cqspi_wait_idle(cqspi);
+	cqspi_controller_init(cqspi);
+
+	cqspi->current_cs = -1;
+	cqspi->sclk = 0;
+
+	return spi_master_resume(master);
+}
+
+static DEFINE_SIMPLE_DEV_PM_OPS(cqspi_dev_pm_ops, cqspi_suspend, cqspi_resume);
 
 static const struct cqspi_driver_platdata cdns_qspi = {
 	.quirks = CQSPI_DISABLE_DAC_MODE,
@@ -2374,7 +2427,7 @@ static struct platform_driver cqspi_platform_driver = {
 	.remove = cqspi_remove,
 	.driver = {
 		.name = CQSPI_NAME,
-		.pm = CQSPI_DEV_PM_OPS,
+		.pm = &cqspi_dev_pm_ops,
 		.of_match_table = cqspi_dt_ids,
 	},
 };

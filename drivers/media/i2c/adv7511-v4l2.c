@@ -52,6 +52,7 @@ MODULE_LICENSE("GPL v2");
 #define ADV7511_MAX_HEIGHT 1200
 #define ADV7511_MIN_PIXELCLOCK 20000000
 #define ADV7511_MAX_PIXELCLOCK 225000000
+#define XYLON_LOGICVC_INTG
 
 #define ADV7511_MAX_ADDRS (3)
 
@@ -2267,10 +2268,6 @@ static int adv7511_probe(struct i2c_client *client, const struct i2c_device_id *
 	if (!state)
 		return -ENOMEM;
 
-	state->pd_gpio = devm_gpiod_get_optional(&client->dev, "powerdown", GPIOD_OUT_LOW);
-	if (IS_ERR(state->pd_gpio))
-		return PTR_ERR(state->pd_gpio);
-
 	if (client->dev.of_node) {
 		adv7511_get_ofdt_config(client, state);
 	} else {
@@ -2282,6 +2279,7 @@ static int adv7511_probe(struct i2c_client *client, const struct i2c_device_id *
 		memcpy(&state->pdata, pdata, sizeof(state->pdata));
 	}
 
+	memcpy(&state->pdata, pdata, sizeof(state->pdata));
 	state->fmt_code = MEDIA_BUS_FMT_RGB888_1X24;
 	state->colorspace = V4L2_COLORSPACE_SRGB;
 
@@ -2291,8 +2289,6 @@ static int adv7511_probe(struct i2c_client *client, const struct i2c_device_id *
 			 client->addr << 1);
 
 	v4l2_i2c_subdev_init(sd, client, &adv7511_ops);
-	sd->flags |= V4L2_SUBDEV_FL_HAS_DEVNODE;
-	sd->flags |= V4L2_SUBDEV_FL_HAS_EVENTS;
 	adv7511_subdev(sd);
 	sd->internal_ops = &adv7511_int_ops;
 

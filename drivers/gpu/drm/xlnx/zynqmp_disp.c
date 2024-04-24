@@ -1404,8 +1404,16 @@ static void zynqmp_disp_av_buf_init_live_sf(struct zynqmp_disp_av_buf *av_buf,
 /*
  * Audio functions
  */
+static void zynqmp_disp_aud_init(struct zynqmp_disp_aud *aud)
+{
+	/* Clear the audio soft reset register as it's an non-reset flop */
+	regmap_write(aud->base, ZYNQMP_DISP_AUD_SOFT_RESET, 0);
+	regmap_write(aud->base, ZYNQMP_DISP_AUD_MIXER_VOLUME,
+		     ZYNQMP_DISP_AUD_MIXER_VOLUME_NO_SCALE);
+}
 
 /**
+
  * zynqmp_disp_aud_init - Initialize the audio
  * @aud: audio
  *
@@ -1710,6 +1718,7 @@ static int zynqmp_disp_layer_enable(struct zynqmp_disp *disp,
 
 	return 0;
 }
+
 
 /**
  * zynqmp_disp_layer_disable - Disable the layer
@@ -2119,6 +2128,7 @@ unsigned int zynqmp_disp_get_aud_clk_rate(struct zynqmp_disp *disp)
  * @disp: Display subsystem
  *
  * Return: the crtc mask of the zyqnmp_disp CRTC.
+
  */
 uint32_t zynqmp_disp_get_crtc_mask(struct zynqmp_disp *disp)
 {
@@ -2343,6 +2353,17 @@ zynqmp_disp_plane_atomic_update(struct drm_plane *plane,
 	struct drm_plane_state *old_state = drm_atomic_get_old_plane_state(state, plane);
 
 	if (!plane->state->crtc || !plane->state->fb)
+		return;
+
+	if (plane->state->fb == old_state->fb &&
+	    plane->state->crtc_x == old_state->crtc_x &&
+	    plane->state->crtc_y == old_state->crtc_y &&
+	    plane->state->crtc_w == old_state->crtc_w &&
+	    plane->state->crtc_h == old_state->crtc_h &&
+	    plane->state->src_x == old_state->src_x &&
+	    plane->state->src_y == old_state->src_y &&
+	    plane->state->src_w == old_state->src_w &&
+	    plane->state->src_h == old_state->src_h)
 		return;
 
 	if (old_state->fb &&

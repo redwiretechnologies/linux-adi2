@@ -448,6 +448,7 @@ static int spi_nor_lock(struct mtd_info *mtd, loff_t ofs, uint64_t len)
 	if (!(nor->flags & SNOR_F_HAS_PARALLEL)) {
 		/* Determine the flash from which the operation need to start */
 		while ((cur_cs_num < SNOR_FLASH_CNT_MAX) && (ofs > sz - 1) && params) {
+<<<<<<< HEAD
 			params = spi_nor_get_params(nor, cur_cs_num);
 			sz += params->size;
 			cur_cs_num++;
@@ -456,6 +457,11 @@ static int spi_nor_lock(struct mtd_info *mtd, loff_t ofs, uint64_t len)
 		if (cur_cs_num == SNOR_FLASH_CNT_MAX) {
 			ret = -ENODEV;
 			goto err;
+=======
+			cur_cs_num++;
+			params = spi_nor_get_params(nor, cur_cs_num);
+			sz += params->size;
+>>>>>>> linux-xlnx/xlnx_rebase_v6.1_LTS
 		}
 	}
 	if (nor->flags & SNOR_F_HAS_PARALLEL) {
@@ -494,6 +500,7 @@ static int spi_nor_unlock(struct mtd_info *mtd, loff_t ofs, uint64_t len)
 	if (!(nor->flags & SNOR_F_HAS_PARALLEL)) {
 		/* Determine the flash from which the operation need to start */
 		while ((cur_cs_num < SNOR_FLASH_CNT_MAX) && (ofs > sz - 1) && params) {
+<<<<<<< HEAD
 			params = spi_nor_get_params(nor, cur_cs_num);
 			sz += params->size;
 			cur_cs_num++;
@@ -502,6 +509,11 @@ static int spi_nor_unlock(struct mtd_info *mtd, loff_t ofs, uint64_t len)
 		if (cur_cs_num == SNOR_FLASH_CNT_MAX) {
 			ret = -ENODEV;
 			goto err;
+=======
+			cur_cs_num++;
+			params = spi_nor_get_params(nor, cur_cs_num);
+			sz += params->size;
+>>>>>>> linux-xlnx/xlnx_rebase_v6.1_LTS
 		}
 	}
 	if (nor->flags & SNOR_F_HAS_PARALLEL) {

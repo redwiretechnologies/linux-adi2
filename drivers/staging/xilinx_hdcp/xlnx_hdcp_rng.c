@@ -10,7 +10,6 @@
  * produce random numbers during the HDCP authentication and Key exchange.
  */
 
-#include <linux/bitfield.h>
 #include <linux/io.h>
 #include <linux/xlnx/xlnx_hdcp_rng.h>
 
