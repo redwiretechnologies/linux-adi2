@@ -3,14 +3,14 @@
  * Analog Devices EVAL-AD7986FMCZ
  * https://www.analog.com/en/products/ad7986.html
  *
- * hdl_project: <pulsar_adc_pmdz/zed>
+ * hdl_project: <pulsar_adc/zed>
+ * Link: https://github.com/analogdevicesinc/hdl/tree/main/projects/pulsar_adc
  * board_revision: <>
  *
  * Copyright (C) 2024 Analog Devices Inc.
  */
 /dts-v1/;
 
-#include <dt-bindings/dma/axi-dmac.h>
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/interrupt-controller/irq.h>
 
@@ -53,7 +53,7 @@
 
 &fpga_axi {
 	adc_trigger: pwm@44b00000 {
-		compatible = "adi,axi-pwmgen";
+		compatible = "adi,axi-pwmgen-2.00.a";
 		reg = <0x44b00000 0x1000>;
 		#pwm-cells = <2>;
 		clocks = <&spi_clk>;
@@ -65,19 +65,6 @@
 		#dma-cells = <1>;
 		interrupts = <0 57 IRQ_TYPE_LEVEL_HIGH>;
 		clocks = <&clkc 17>;
-
-		adi,channels {
-			#size-cells = <0>;
-			#address-cells = <1>;
-
-			dma-channel@0 {
-				reg = <0>;
-				adi,source-bus-width = <32>;
-				adi,source-bus-type = <AXI_DMAC_BUS_TYPE_AXI_STREAM>;
-				adi,destination-bus-width = <64>;
-				adi,destination-bus-type = <AXI_DMAC_BUS_TYPE_AXI_MM>;
-			};
-		};
 	};
 
 	spi_clk: clock-controller@44a70000 {

@@ -11,7 +11,7 @@
  * Copyright (C) 2020 Analog Devices Inc.
  */
 /dts-v1/;
-#include "socfpga_cyclone5_de10_nano.dtsi"
+#include "socfpga_cyclone5_de10_nano_hps.dtsi"
 #include <dt-bindings/interrupt-controller/irq.h>
 #include <dt-bindings/gpio/gpio.h>
 
@@ -98,19 +98,6 @@
 		interrupts = <0 44 IRQ_TYPE_LEVEL_HIGH>;
 		#dma-cells = <1>;
 		clocks = <&h2f_user0_clk>;
-
-		adi,channels {
-			#size-cells = <0>;
-			#address-cells = <1>;
-
-			dma-channel@0 {
-				reg = <0>;
-				adi,source-bus-width = <32>;
-				adi,source-bus-type = <1>;
-				adi,destination-bus-width = <64>;
-				adi,destination-bus-type = <0>;
-			};
-		};
 	};
 
 	spi@0x00030000 {

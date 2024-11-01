@@ -21,19 +21,6 @@
 		#dma-cells = <1>;
 		interrupts = <0 57 IRQ_TYPE_LEVEL_HIGH>; /* 57 */
 		clocks = <&clkc 16>;
-
-		adi,channels {
-			#size-cells = <0>;
-			#address-cells = <1>;
-
-			dma-channel@0 {
-				reg = <0>;
-				adi,source-bus-width = <64>;
-				adi,source-bus-type = <2>;
-				adi,destination-bus-width = <64>;
-				adi,destination-bus-type = <0>;
-			};
-		};
 	};
 
 	axi_ad9434_core_0: axi-ad9434-core-lpc@44a00000 {
@@ -52,3 +39,12 @@
 #define fmc_spi spi0
 
 #include "adi-ad9434-fmc-500ebz.dtsi"
+
+/*
+ * It is limited because of Zed board; check AC DC switching characteristics:
+ * 464MHz is the limit.
+ * 2.156ns is the adc_clk period in HDL
+ */
+&ad9517_ref_clk {
+	clock-frequency = <463820000>; // 463.82MHz
+};
