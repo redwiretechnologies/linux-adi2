@@ -143,19 +143,6 @@
 				interrupts = <0 31 4>;
 				#dma-cells = <1>;
 				clocks = <&dma_clk>;
-
-				adi,channels {
-					#size-cells = <0>;
-					#address-cells = <1>;
-
-					dma-channel@0 {
-						reg = <0>;
-						adi,source-bus-width = <256>;
-						adi,source-bus-type = <2>;
-						adi,destination-bus-width = <64>;
-						adi,destination-bus-type = <0>;
-					};
-				};
 			};
 
 			axi_ad9094_core: axi-ad9094-hpc@50000 {
@@ -172,6 +159,11 @@
 				reg = <0x00060000 0x10000>;
 				interrupts = <0 32 4>;
 				clocks = <&ad9528 3>;
+			};
+
+			axi_sysid_0: axi-sysid-0@18000 {
+				compatible = "adi,axi-sysid-1.00.a";
+				reg = <0x00018000 0x8000>;
 			};
 		};
 	};

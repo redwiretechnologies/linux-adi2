@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-2.0
+/* Copyright (C) 2024 Analog Devices Inc. */
+
 / {
 	soc {
 		sys_hps_bridges: bridge@ff200000 {
@@ -36,7 +39,9 @@
 			};
 
 			dac_dma: dmac@40000 {
+				compatible = "adi,axi-dmac-1.00.a";
 				reg = <0x40000 0x4000>;
+				#dma-cells = <1>;
 
 				interrupt-parent = <&intc>;
 				interrupts = <0 30 0>;
@@ -89,6 +94,11 @@
 
 				#clock-cells = <0>;
 				clock-output-names = "jesd204_tx_link_clock";
+			};
+
+			axi_sysid_0: axi-sysid-0@18000 {
+				compatible = "adi,axi-sysid-1.00.a";
+				reg = <0x00018000 0x8000>;
 			};
 		};
 	};
